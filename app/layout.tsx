@@ -1,6 +1,8 @@
 import './globals.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { ThemeProvider } from '../Context/ThemeContext';
+
 
 export const metadata = {
   title: 'Jersey',
@@ -14,11 +16,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-white text-black">
-        <Navbar />
-        <main className="min-h-[70vh] px-4 py-6">{children}</main>
-        <Footer />
+      <body className="min-h-screen transition-colors duration-500 text-black dark:text-white bg-gradient-to-br from-[#B9EAB6] to-white dark:from-[#1E3D22] dark:to-black">
+        <ThemeProvider>
+          <Navbar />
+          <main className="min-h-screen py-12 px-6 transition-colors duration-500">
+            {children}
+          </main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+

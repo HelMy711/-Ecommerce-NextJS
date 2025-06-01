@@ -2,15 +2,40 @@
 
 import { useState } from 'react';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function RegisterPage() {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Call your register API here
-    console.log('Register:', { name, email, password });
+    setError('');
+    setSuccess('');
+    try {
+      const res = await fetch(`${API_URL}/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phoneNumber, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Registration failed');
+        return;
+      }
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        setSuccess('Registration successful!');
+        window.location.href = '/products'; // إعادة التوجيه بعد التسجيل
+      } else {
+        setError('No token returned from server');
+      }
+    } catch (err) {
+      setError('Something went wrong');
+    }
   };
 
   return (
@@ -26,11 +51,11 @@ export default function RegisterPage() {
           required
         />
         <input
-          type="email"
-          placeholder="Email"
+          type="text"
+          placeholder="Phone Number"
           className="w-full border px-4 py-2 rounded dark:bg-gray-800 dark:text-white"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
           required
         />
         <input
@@ -47,6 +72,8 @@ export default function RegisterPage() {
         >
           Register
         </button>
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        {success && <p className="text-green-500 text-center">{success}</p>}
       </form>
     </main>
   );
